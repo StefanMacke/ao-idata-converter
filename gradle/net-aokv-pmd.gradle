@@ -1,0 +1,18 @@
+/*
+    Performs quality checks on your project's Java source files using PMD and generates reports from these checks.
+    Rulesets: http://pmd.sourceforge.net/
+ */
+apply plugin: 'pmd'
+
+logger.info('PMD plugin activated')
+logger.info("pluginConfigPath: ${project.pluginConfigPath}")
+
+tasks.withType(Pmd) {
+    ignoreFailures = true
+    ruleSetFiles = files("${project.pluginConfigPath}/pmd/rulesets.xml")
+	consoleOutput = true
+    reports {
+        xml.enabled true
+        html.enabled true
+    }
+}

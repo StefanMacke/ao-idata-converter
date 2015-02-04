@@ -1,0 +1,8 @@
+apply plugin: 'checkstyle'
+
+logger.info('Checkstyle plugin activated')
+logger.info("pluginConfigPath: ${project.pluginConfigPath}")
+
+tasks.withType(Checkstyle) {
+    ignoreFailures = true
+}

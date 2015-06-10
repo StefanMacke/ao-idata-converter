@@ -21,6 +21,7 @@ import java.util.Arrays;
 import net.aokv.idataconverter.examples.Address;
 import net.aokv.idataconverter.examples.Boss;
 import net.aokv.idataconverter.examples.Company;
+import net.aokv.idataconverter.examples.Country;
 import net.aokv.idataconverter.examples.Employee;
 import net.aokv.idataconverter.examples.Person;
 import net.aokv.idataconverter.examples.StockPrice;
@@ -122,6 +123,13 @@ public class ObjectConverterShould
 	{
 		final IData idata = sut.convertToIData("name", "Stefan");
 		assertIDataOnlyContains(idata, "name", "Stefan");
+	}
+
+	@Test
+	public void convertEnumerations() throws ObjectConversionException
+	{
+		final IData idata = sut.convertToIData("country", Country.Germany);
+		assertIDataOnlyContains(idata, "country", "Germany");
 	}
 
 	@Test
@@ -280,6 +288,7 @@ public class ObjectConverterShould
 		addressObject.setStreet("My Street 123");
 		addressObject.ZipCode = "12345";
 		addressObject.setCity("My City");
+		addressObject.country = Country.Germany;
 		final IData addressIData = createAddressIData(addressObject);
 		final IData expected = createIData("address", addressIData);
 

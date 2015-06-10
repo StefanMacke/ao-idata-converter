@@ -80,6 +80,7 @@ public final class TestHelper
 		final IData addressIData = IDataFactory.create();
 		final IDataCursor addressCursor = addressIData.getCursor();
 		IDataUtil.put(addressCursor, "ZipCode", address.ZipCode);
+		IDataUtil.put(addressCursor, "country", address.country.toString());
 		IDataUtil.put(addressCursor, "CityName", address.getCity());
 		IDataUtil.put(addressCursor, "Street", address.getStreet());
 		return addressIData;

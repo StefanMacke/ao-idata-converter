@@ -48,6 +48,10 @@ public class ObjectConverter extends Converter
 		{
 			return object;
 		}
+		if (objectType.isEnum())
+		{
+			return object.toString();
+		}
 		if (objectType.isArray())
 		{
 			return convertArray((Object[]) object);

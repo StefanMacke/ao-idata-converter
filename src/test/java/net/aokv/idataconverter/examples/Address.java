@@ -14,6 +14,8 @@ public class Address
 	@PipelineName("CityName")
 	private String city;
 
+	public Country country;
+
 	public String getStreet()
 	{
 		return street;
@@ -37,7 +39,7 @@ public class Address
 	@Override
 	public String toString()
 	{
-		return "Address [street=" + street + ", ZipCode=" + ZipCode + ", city=" + city + "]";
+		return "Address [street=" + street + ", ZipCode=" + ZipCode + ", city=" + city + ", country=" + country + "]";
 	}
 
 	@Override
@@ -64,7 +66,8 @@ public class Address
 		final Address other = (Address) obj;
 		return Objects.equal(street, other.street)
 				&& Objects.equal(ZipCode, other.ZipCode)
-				&& Objects.equal(city, other.city);
+				&& Objects.equal(city, other.city)
+				&& Objects.equal(country, other.country);
 	}
 
 }

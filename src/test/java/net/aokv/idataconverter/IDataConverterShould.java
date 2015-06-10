@@ -25,6 +25,7 @@ import net.aokv.idataconverter.examples.Address;
 import net.aokv.idataconverter.examples.BaseObject;
 import net.aokv.idataconverter.examples.Boss;
 import net.aokv.idataconverter.examples.Company;
+import net.aokv.idataconverter.examples.Country;
 import net.aokv.idataconverter.examples.Employee;
 import net.aokv.idataconverter.examples.Person;
 import net.aokv.idataconverter.examples.StockPrice;
@@ -127,6 +128,14 @@ public class IDataConverterShould
 		assertThat(sut.convertToObject(iData, "double", Double.class), is(Double.MAX_VALUE));
 		assertThat(sut.convertToObject(iData, "char", Character.class), is('a'));
 		assertThat(sut.convertToObject(iData, "boolean", Boolean.class), is(true));
+	}
+
+	@Test
+	public void convertEnumerations() throws IDataConversionException
+	{
+		final IData iData = createIData("value", "Germany");
+		final Country actual = sut.convertToObject(iData, "value", Country.class);
+		assertThat(actual, is(Country.Germany));
 	}
 
 	@Test
@@ -345,6 +354,7 @@ public class IDataConverterShould
 		addressObject.setStreet("My Street 123");
 		addressObject.ZipCode = "12345";
 		addressObject.setCity("My City");
+		addressObject.country = Country.Germany;
 		final IData addressIData = createAddressIData(addressObject);
 		final Address actual = sut.convertToObject(addressIData, Address.class);
 		assertThat(actual, is(addressObject));

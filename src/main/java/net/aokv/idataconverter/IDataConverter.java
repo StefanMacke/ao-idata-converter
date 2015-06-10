@@ -16,7 +16,8 @@ import com.wm.data.IDataUtil;
 
 public class IDataConverter extends Converter
 {
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings(
+	{ "unchecked", "rawtypes" })
 	public <T> T convertToObject(final Object iData, final Class<T> objectType)
 			throws IDataConversionException
 	{
@@ -27,6 +28,10 @@ public class IDataConverter extends Converter
 		if (isPrimitiveType(objectType))
 		{
 			return (T) iData;
+		}
+		if (objectType.isEnum())
+		{
+			return convertEnum(iData.toString(), (Class<? extends Enum>) objectType);
 		}
 
 		try
@@ -145,6 +150,14 @@ public class IDataConverter extends Converter
 		throw new IDataConversionException(
 				String.format("Field <%s> does not exist in IData: %s",
 						fieldName, new IDataFormatter().format(iData)));
+	}
+
+	@SuppressWarnings(
+	{ "rawtypes", "unchecked" })
+	private <T> T convertEnum(final String enumValue, final Class<? extends Enum> enumType)
+			throws IDataConversionException
+	{
+		return (T) Enum.valueOf(enumType, enumValue);
 	}
 
 	@SuppressWarnings("unchecked")

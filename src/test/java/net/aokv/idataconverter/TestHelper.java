@@ -55,6 +55,16 @@ public final class TestHelper
 		{
 			employees[i] = createPersonIData(company.Employees.get(i));
 		}
+		String[] aList = null;
+		if (company.aList != null)
+		{
+			aList = company.aList.toArray(new String[company.aList.size()]);
+		}
+		Integer[] anEmptyList = null;
+		if (company.anEmptyList != null)
+		{
+			anEmptyList = new Integer[0];
+		}
 
 		final IData companyIData = IDataFactory.create();
 		final IDataCursor companyCursor = companyIData.getCursor();
@@ -62,6 +72,8 @@ public final class TestHelper
 		IDataUtil.put(companyCursor, "Employees", employees);
 		IDataUtil.put(companyCursor, "Name", company.Name);
 		IDataUtil.put(companyCursor, "StockName", company.StockName);
+		IDataUtil.put(companyCursor, "aList", aList);
+		IDataUtil.put(companyCursor, "anEmptyList", anEmptyList);
 		IDataUtil.put(companyCursor, "TheBoss", createBossIData(company.getBoss()));
 		return companyIData;
 	}

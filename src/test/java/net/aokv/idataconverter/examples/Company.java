@@ -15,6 +15,10 @@ public class Company
 	@PipelineName("AddressLines")
 	public String[] Address;
 
+	public List<String> aList;
+
+	public List<Integer> anEmptyList;
+
 	public String StockName;
 
 	@PipelineName("TheBoss")
@@ -35,13 +39,13 @@ public class Company
 	@Override
 	public String toString()
 	{
-		return "Company [Name=" + Name + ", Address=" + Arrays.toString(Address) + ", StockName=" + StockName + ", boss=" + boss + ", Employees=" + Employees + "]";
+		return "Company [Name=" + Name + ", Address=" + Arrays.toString(Address) + ", aList = " + aList + ", anEmptyList = " + anEmptyList + ", StockName=" + StockName + ", boss=" + boss + ", Employees=" + Employees + "]";
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Objects.hashCode(Name, Address, StockName, boss, Employees);
+		return Objects.hashCode(Name, Address, aList, anEmptyList, StockName, boss, Employees);
 	}
 
 	@Override
@@ -63,6 +67,8 @@ public class Company
 		return Objects.equal(Name, other.Name)
 				&& Arrays.equals(Address, other.Address)
 				&& Objects.equal(StockName, other.StockName)
+				&& Objects.equal(aList, other.aList)
+				&& Objects.equal(anEmptyList, other.anEmptyList)
 				&& Objects.equal(boss, other.boss)
 				&& Objects.equal(Employees, other.Employees);
 	}

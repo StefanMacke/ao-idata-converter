@@ -17,6 +17,7 @@ import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import net.aokv.idataconverter.examples.Address;
 import net.aokv.idataconverter.examples.Boss;
@@ -55,6 +56,12 @@ public class ObjectConverterShould
 		assertThat(String.format("Value for key <%s> should be <%s>, but was <%s>.",
 				key, expectedValue, actualValue),
 				actualValue, is(expectedValue));
+		if (actualValue != null && expectedValue != null)
+		{
+			// make sure that also the types are identical (Object[] != String[])
+			// [ISC.0082.9030] Type mismatch, String expected'
+			assertThat(actualValue.getClass().toString(), is(expectedValue.getClass().toString()));
+		}
 	}
 
 	private void assertIDataOnlyContainsKeys(final IData idata, final String... keys)
@@ -214,6 +221,29 @@ public class ObjectConverterShould
 	}
 
 	@Test
+	public void convertStringLists() throws ObjectConversionException
+	{
+		final List<String> names = new ArrayList<>();
+		names.add("Stefan");
+		names.add("Hans");
+
+		final IData actual = sut.convertToIData("names", names);
+
+		assertIDataOnlyContains(actual, "names", new String[]
+		{ "Stefan", "Hans" });
+	}
+
+	@Test
+	public void convertEmptyStringLists() throws ObjectConversionException
+	{
+		final List<String> names = new ArrayList<>();
+
+		final IData actual = sut.convertToIData("names", names, String.class);
+
+		assertIDataOnlyContains(actual, "names", new String[] {});
+	}
+
+	@Test
 	public void convertObjectLists() throws ObjectConversionException
 	{
 		final Person person1 = createPerson("Stefan", "Macke");
@@ -254,6 +284,10 @@ public class ObjectConverterShould
 		companyObject.Name = "My Company";
 		companyObject.Address = new String[]
 		{ "Street 1", "City" };
+		companyObject.aList = new ArrayList<String>();
+		companyObject.aList.add("aValue");
+		companyObject.aList.add("anotherValue");
+		companyObject.anEmptyList = new ArrayList<Integer>();
 		companyObject.StockName = null;
 		companyObject.setBoss(boss);
 		companyObject.Employees = new ArrayList<>();

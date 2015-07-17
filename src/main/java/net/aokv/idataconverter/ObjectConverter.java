@@ -4,6 +4,8 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Collection;
 
 import com.wm.data.IData;
@@ -12,11 +14,17 @@ import com.wm.data.IDataFactory;
 
 public class ObjectConverter extends Converter
 {
+	public IData convertToIData(final String key, final Object value, final Class<?> elementType)
+			throws ObjectConversionException
+	{
+		final Object iDataValue = convertObject(value, elementType);
+		return wrapInIData(key, iDataValue);
+	}
+
 	public IData convertToIData(final String key, final Object value)
 			throws ObjectConversionException
 	{
-		final Object iDataValue = convertObject(value);
-		return wrapInIData(key, iDataValue);
+		return convertToIData(key, value, null);
 	}
 
 	public IData convertToIData(final Object value)
@@ -34,7 +42,7 @@ public class ObjectConverter extends Converter
 		return output;
 	}
 
-	private Object convertObject(final Object object)
+	private Object convertObject(final Object object, final Class<?> elementType)
 			throws ObjectConversionException
 	{
 		if (object == null)
@@ -56,13 +64,18 @@ public class ObjectConverter extends Converter
 		{
 			return convertArray((Object[]) object);
 		}
-
 		if (Collection.class.isAssignableFrom(objectType))
 		{
-			return convertCollection((Collection<?>) object);
+			return convertCollection((Collection<?>) object, elementType);
 		}
 
 		return convertClass(object);
+	}
+
+	private Object convertObject(final Object object)
+			throws ObjectConversionException
+	{
+		return convertObject(object, null);
 	}
 
 	private Object convertArray(final Object[] object)
@@ -72,15 +85,40 @@ public class ObjectConverter extends Converter
 		final IData[] elements = new IData[length];
 		for (int i = 0; i < length; i++)
 		{
-			elements[i] = (IData) convertObject(Array.get(object, i));
+			elements[i] = convertToIData(Array.get(object, i));
 		}
 		return elements;
 	}
 
-	private Object convertCollection(final Collection<?> object)
+	private Object convertCollection(final Collection<?> collection, final Class<?> elementType)
 			throws ObjectConversionException
 	{
-		return convertArray(object.toArray(new Object[object.size()]));
+		final Object[] array = collection.toArray(new Object[collection.size()]);
+		if (array.length == 0 || isPrimitiveType(array[0].getClass()))
+		{
+			return convertCollectionToArray(collection, elementType);
+		}
+		return convertArray(array);
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T> T[] convertCollectionToArray(final Collection<T> collection, Class<?> elementType)
+	{
+		if (elementType == null)
+		{
+			if (collection.iterator().hasNext())
+			{
+				final T firstElement = collection.iterator().next();
+				elementType = firstElement.getClass();
+			}
+			else
+			{
+				return (T[]) collection.toArray();
+			}
+		}
+
+		final T[] array = (T[]) Array.newInstance(elementType, collection.size());
+		return collection.toArray(array);
 	}
 
 	private Object convertClass(final Object object)
@@ -107,9 +145,9 @@ public class ObjectConverter extends Converter
 			for (final Field field : fields)
 			{
 				final String fieldName = generateFieldName(field, field.getName());
-				Object fieldValue;
-				fieldValue = field.get(object);
-				final Object fieldData = convertObject(fieldValue);
+				final Object fieldValue = field.get(object);
+				final Class<?> elementType = getParameterType(field);
+				final Object fieldData = convertObject(fieldValue, elementType);
 				idc.insertAfter(fieldName, fieldData);
 			}
 		}
@@ -117,6 +155,19 @@ public class ObjectConverter extends Converter
 		{
 			throw new ObjectConversionException(e.getMessage(), e);
 		}
+	}
+
+	protected Class<?> getParameterType(final Field field)
+	{
+		Class<?> elementType = null;
+		final Type type = field.getGenericType();
+		if (type instanceof ParameterizedType)
+		{
+			final ParameterizedType pType = (ParameterizedType) type;
+			final Type parameterType = pType.getActualTypeArguments()[0];
+			elementType = (Class<?>) parameterType;
+		}
+		return elementType;
 	}
 
 	private void convertGetters(final Object object, final IDataCursor idc)

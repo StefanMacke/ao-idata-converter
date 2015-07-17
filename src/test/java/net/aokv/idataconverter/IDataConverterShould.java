@@ -237,6 +237,19 @@ public class IDataConverterShould
 	}
 
 	@Test
+	public void convertEmptyStringLists() throws IDataConversionException
+	{
+		final String[] array = new String[0];
+		final IData iData = createIData("array", array);
+		final List<String> expected = new ArrayList<>();
+
+		@SuppressWarnings("unchecked")
+		final List<String> actual = sut.convertToObject(iData, "array", expected.getClass(), String.class);
+
+		assertThat(actual, is(expected));
+	}
+
+	@Test
 	public void convertNullListsToNull() throws IDataConversionException
 	{
 		final IData iData = createIData("array", null);

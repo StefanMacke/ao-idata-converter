@@ -94,7 +94,8 @@ public class ObjectConverter extends Converter
 			throws ObjectConversionException
 	{
 		final Object[] array = collection.toArray(new Object[collection.size()]);
-		if (array.length == 0 || isPrimitiveType(array[0].getClass()))
+		if (array.length == 0 && isPrimitiveType(elementType)
+				|| array.length > 0 && isPrimitiveType(array[0].getClass()))
 		{
 			return convertCollectionToArray(collection, elementType);
 		}

@@ -261,6 +261,16 @@ public class ObjectConverterShould
 	}
 
 	@Test
+	public void convertEmptyObjectLists() throws ObjectConversionException
+	{
+		final IData expected = createIData("people", new IData[] {});
+
+		final IData actual = sut.convertToIData("people", new ArrayList<Person>());
+
+		assertIDataEquals(actual, expected);
+	}
+
+	@Test
 	public void convertObjectWithObjectFields() throws ObjectConversionException
 	{
 		final Person personObject = createPerson("Hans", "Meier");

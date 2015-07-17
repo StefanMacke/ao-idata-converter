@@ -9,6 +9,10 @@ public class Converter
 {
 	protected <T> boolean isPrimitiveType(final Class<T> objectType)
 	{
+		if (objectType == null)
+		{
+			return false;
+		}
 		if (objectType.isArray())
 		{
 			final Class<?> componentType = objectType.getComponentType();
@@ -88,7 +92,7 @@ public class Converter
 
 	protected Field getField(
 			final Class<?> objectType, final String originalFieldName, final String fieldName)
-					throws NoSuchFieldException
+			throws NoSuchFieldException
 	{
 		Field field = getField(objectType, originalFieldName);
 		if (field == null)

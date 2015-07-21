@@ -15,8 +15,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import net.aokv.idataconverter.examples.Address;
@@ -125,21 +127,21 @@ public class ObjectConverterShould
 	}
 
 	@Test
-	public void convertNull() throws ObjectConversionException
+	public void convertNull() throws Exception
 	{
 		final IData idata = sut.convertToIData("Null", null);
 		assertIDataOnlyContains(idata, "Null", null);
 	}
 
 	@Test
-	public void convertStrings() throws ObjectConversionException
+	public void convertStrings() throws Exception
 	{
 		final IData idata = sut.convertToIData("name", "Stefan");
 		assertIDataOnlyContains(idata, "name", "Stefan");
 	}
 
 	@Test
-	public void convertPrimitiveDataTypes() throws ObjectConversionException
+	public void convertPrimitiveDataTypes() throws Exception
 	{
 		IData idata = sut.convertToIData("int", 123);
 		assertIDataOnlyContains(idata, "int", "123");
@@ -155,14 +157,14 @@ public class ObjectConverterShould
 	}
 
 	@Test
-	public void convertEnumerations() throws ObjectConversionException
+	public void convertEnumerations() throws Exception
 	{
 		final IData idata = sut.convertToIData("country", Country.Germany);
 		assertIDataOnlyContains(idata, "country", "Germany");
 	}
 
 	@Test
-	public void convertStringArrays() throws ObjectConversionException
+	public void convertStringArrays() throws Exception
 	{
 		final IData idata = sut.convertToIData("array", new String[]
 		{ "1", "2", "3" });
@@ -171,7 +173,7 @@ public class ObjectConverterShould
 	}
 
 	@Test
-	public void convertSimpleArrays() throws ObjectConversionException
+	public void convertSimpleArrays() throws Exception
 	{
 		IData idata = sut.convertToIData("array", new int[]
 		{ 1, 2, 3 });
@@ -185,7 +187,7 @@ public class ObjectConverterShould
 	}
 
 	@Test
-	public void convertTwoDimensionalStringArrays() throws ObjectConversionException
+	public void convertTwoDimensionalStringArrays() throws Exception
 	{
 		final IData idata = sut.convertToIData("array", new String[][]
 		{
@@ -202,7 +204,7 @@ public class ObjectConverterShould
 	}
 
 	@Test
-	public void convertTwoDimensionalPrimitiveArrays() throws ObjectConversionException
+	public void convertTwoDimensionalPrimitiveArrays() throws Exception
 	{
 		final IData idata = sut.convertToIData("array", new int[][]
 		{
@@ -219,7 +221,7 @@ public class ObjectConverterShould
 	}
 
 	@Test
-	public void convertObjectsWithStringFields() throws ObjectConversionException
+	public void convertObjectsWithStringFields() throws Exception
 	{
 		final Person personObject = createPerson("Stefan", "Macke");
 
@@ -232,7 +234,7 @@ public class ObjectConverterShould
 	}
 
 	@Test
-	public void convertObjectsWithoutFieldName() throws ObjectConversionException
+	public void convertObjectsWithoutFieldName() throws Exception
 	{
 		final Person personObject = createPerson("Stefan", "Macke");
 		final IData expected = createPersonIData(personObject);
@@ -243,7 +245,7 @@ public class ObjectConverterShould
 	}
 
 	@Test
-	public void convertObjectArrays() throws ObjectConversionException
+	public void convertObjectArrays() throws Exception
 	{
 		final Person person1 = createPerson("Stefan", "Macke");
 		final Person person2 = createPerson("Hans", "Meier");
@@ -264,7 +266,7 @@ public class ObjectConverterShould
 	}
 
 	@Test
-	public void convertEmptyObjectArrays() throws ObjectConversionException
+	public void convertEmptyObjectArrays() throws Exception
 	{
 		final IData[] expected = new IData[0];
 		final IData actual = sut.convertToIData("people", new Person[] {});
@@ -272,7 +274,7 @@ public class ObjectConverterShould
 	}
 
 	@Test
-	public void convertStringLists() throws ObjectConversionException
+	public void convertStringLists() throws Exception
 	{
 		final List<String> names = new ArrayList<>();
 		names.add("Stefan");
@@ -285,7 +287,7 @@ public class ObjectConverterShould
 	}
 
 	@Test
-	public void convertEmptyStringArrays() throws ObjectConversionException
+	public void convertEmptyStringArrays() throws Exception
 	{
 		final String[] names = new String[0];
 		final IData actual = sut.convertToIData("names", names);
@@ -293,7 +295,7 @@ public class ObjectConverterShould
 	}
 
 	@Test
-	public void convertEmptyStringLists() throws ObjectConversionException
+	public void convertEmptyStringLists() throws Exception
 	{
 		final List<String> names = new ArrayList<>();
 		final IData actual = sut.convertToIData("names", names, String.class);
@@ -301,7 +303,7 @@ public class ObjectConverterShould
 	}
 
 	@Test
-	public void convertObjectLists() throws ObjectConversionException
+	public void convertObjectLists() throws Exception
 	{
 		final Person person1 = createPerson("Stefan", "Macke");
 		final Person person2 = createPerson("Hans", "Meier");
@@ -322,7 +324,7 @@ public class ObjectConverterShould
 	}
 
 	@Test
-	public void convertEmptyObjectLists() throws ObjectConversionException
+	public void convertEmptyObjectLists() throws Exception
 	{
 		final IData[] expected = new IData[0];
 		final IData actual = sut.convertToIData("people", new ArrayList<Person>());
@@ -330,7 +332,7 @@ public class ObjectConverterShould
 	}
 
 	@Test
-	public void convertObjectWithObjectFields() throws ObjectConversionException
+	public void convertObjectWithObjectFields() throws Exception
 	{
 		final Person personObject = createPerson("Hans", "Meier");
 		final Boss bossObject = createBoss("Stefan", "Macke", personObject);
@@ -344,7 +346,7 @@ public class ObjectConverterShould
 	}
 
 	@Test
-	public void convertComplexObjects() throws ObjectConversionException
+	public void convertComplexObjects() throws Exception
 	{
 		final Person employee1 = createPerson("Hans", "Meier");
 		final Person employee2 = createPerson("Gustav", "Gans");
@@ -374,7 +376,7 @@ public class ObjectConverterShould
 	}
 
 	@Test
-	public void useAnnotatedPipelineNamesIfPresent() throws ObjectConversionException
+	public void useAnnotatedPipelineNamesIfPresent() throws Exception
 	{
 		final StockPrice stockPriceObject = new StockPrice();
 		stockPriceObject.CompanyName = "My Company";
@@ -388,7 +390,7 @@ public class ObjectConverterShould
 	}
 
 	@Test
-	public void useGettersAndSettersIfPresentAfterUsingFields() throws ObjectConversionException
+	public void useGettersAndSettersIfPresentAfterUsingFields() throws Exception
 	{
 		final Address addressObject = new Address();
 		addressObject.setStreet("My Street 123");
@@ -404,7 +406,7 @@ public class ObjectConverterShould
 	}
 
 	@Test
-	public void convertSubclassesWithPrimitiveFieldsOtherThanString() throws ObjectConversionException
+	public void convertSubclassesWithPrimitiveFieldsOtherThanString() throws Exception
 	{
 		final Employee employeeObject = createEmployee("Stefan", "Macke", 30, 123.12, false);
 		final IData employeeIData = createEmployeeIData(employeeObject);
@@ -416,7 +418,7 @@ public class ObjectConverterShould
 	}
 
 	@Test
-	public void convertInnerClasses() throws ObjectConversionException
+	public void convertInnerClasses() throws Exception
 	{
 		final Wrapper wrapperObject = new Wrapper();
 		wrapperObject.Input = new Input();
@@ -431,4 +433,14 @@ public class ObjectConverterShould
 
 		assertIDataEquals(actual, expected);
 	}
+
+	@Test
+	public void convertDates() throws Exception
+	{
+		Date date = new SimpleDateFormat("yyyy-MM-dd").parse("2015-01-01");
+		final IData expected = createIData("date", "2015-01-01");
+		final IData actual = sut.convertToIData("date", date);
+		assertIDataEquals(actual, expected);
+	}
+
 }

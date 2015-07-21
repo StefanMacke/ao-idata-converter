@@ -6,7 +6,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 
 import com.wm.data.IData;
 import com.wm.data.IDataCursor;
@@ -80,6 +82,10 @@ public class ObjectConverter extends Converter
 		if (objectType.isEnum())
 		{
 			return object.toString();
+		}
+		if (objectType.equals(Date.class))
+		{
+			return new SimpleDateFormat("yyyy-MM-dd").format((Date) object);
 		}
 
 		return convertClass(object);

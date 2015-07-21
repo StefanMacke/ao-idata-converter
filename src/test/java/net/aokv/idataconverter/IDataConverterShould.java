@@ -131,6 +131,39 @@ public class IDataConverterShould
 	}
 
 	@Test
+	public void convertPrimitiveDataTypesFromStrings() throws IDataConversionException
+	{
+		final IData iData = IDataFactory.create();
+		final IDataCursor iDataCursor = iData.getCursor();
+		IDataUtil.put(iDataCursor, "byte", "1");
+		IDataUtil.put(iDataCursor, "short", "2");
+		IDataUtil.put(iDataCursor, "int", "3");
+		IDataUtil.put(iDataCursor, "long", "4");
+		IDataUtil.put(iDataCursor, "float", "5.0");
+		IDataUtil.put(iDataCursor, "double", "6.0");
+		IDataUtil.put(iDataCursor, "char", "a");
+		IDataUtil.put(iDataCursor, "boolean", "true");
+		iDataCursor.destroy();
+
+		assertThat(sut.convertToObject(iData, "byte", Byte.class), is((byte) 1));
+		assertThat(sut.convertToObject(iData, "byte", byte.class), is((byte) 1));
+		assertThat(sut.convertToObject(iData, "short", Short.class), is((short) 2));
+		assertThat(sut.convertToObject(iData, "short", short.class), is((short) 2));
+		assertThat(sut.convertToObject(iData, "int", Integer.class), is(3));
+		assertThat(sut.convertToObject(iData, "int", int.class), is(3));
+		assertThat(sut.convertToObject(iData, "long", Long.class), is(4L));
+		assertThat(sut.convertToObject(iData, "long", long.class), is(4L));
+		assertThat(sut.convertToObject(iData, "float", Float.class), is((float) 5.0));
+		assertThat(sut.convertToObject(iData, "float", float.class), is((float) 5.0));
+		assertThat(sut.convertToObject(iData, "double", Double.class), is(6.0));
+		assertThat(sut.convertToObject(iData, "double", double.class), is(6.0));
+		assertThat(sut.convertToObject(iData, "char", Character.class), is('a'));
+		assertThat(sut.convertToObject(iData, "char", char.class), is('a'));
+		assertThat(sut.convertToObject(iData, "boolean", Boolean.class), is(true));
+		assertThat(sut.convertToObject(iData, "boolean", boolean.class), is(true));
+	}
+
+	@Test
 	public void convertEnumerations() throws IDataConversionException
 	{
 		final IData iData = createIData("value", "Germany");
@@ -170,6 +203,24 @@ public class IDataConverterShould
 		final IData dIData = createIData("array", dArray);
 		final Double[] dActual = sut.convertToObject(dIData, "array", Double[].class);
 		assertThat(dActual, is(dArray));
+	}
+
+	@Test
+	public void convertSimpleArraysFromStrings() throws IDataConversionException
+	{
+		String[] array = new String[]
+		{ "1", "2" };
+		final IData iData = createIData("array", array);
+		final int[] actual = sut.convertToObject(iData, "array", int[].class);
+		assertThat(actual, is(new int[]
+		{ 1, 2 }));
+
+		array = new String[]
+		{ "1.1", "2.2" };
+		final IData dIData = createIData("array", array);
+		final Double[] dActual = sut.convertToObject(dIData, "array", Double[].class);
+		assertThat(dActual, is(new Double[]
+		{ 1.1, 2.2 }));
 	}
 
 	@Test
@@ -324,12 +375,14 @@ public class IDataConverterShould
 		final Company companyObject = new Company();
 		companyObject.Name = "My Company";
 		companyObject.Address = new String[]
-				{ "Street 1", "City" };
+		{ "Street 1", "City" };
 		companyObject.StockName = null;
 		companyObject.setBoss(boss);
 		companyObject.Employees = new ArrayList<>();
 		companyObject.Employees.add(employee1);
 		companyObject.Employees.add(employee2);
+		companyObject.EmployeesArray = new Person[]
+		{ employee1, employee2 };
 		final IData companyIData = createCompanyIData(companyObject);
 
 		final Company actual = sut.convertToObject(companyIData, Company.class);
@@ -344,8 +397,6 @@ public class IDataConverterShould
 		final IData companyIData = createCompanyIData(companyObject);
 
 		final Company actual = sut.convertToObject(companyIData, Company.class);
-
-		companyObject.Employees = new ArrayList<>();
 		assertThat(actual, is(companyObject));
 	}
 

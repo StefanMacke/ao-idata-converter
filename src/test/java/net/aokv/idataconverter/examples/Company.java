@@ -80,6 +80,6 @@ public class Company
 				&& Objects.equal(anEmptyList, other.anEmptyList)
 				&& Objects.equal(boss, other.boss)
 				&& Objects.equal(Employees, other.Employees)
-				&& Objects.equal(EmployeesArray, other.EmployeesArray);
+				&& Arrays.deepEquals(EmployeesArray, other.EmployeesArray);
 	}
 }

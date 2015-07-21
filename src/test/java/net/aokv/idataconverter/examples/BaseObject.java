@@ -1,5 +1,7 @@
 package net.aokv.idataconverter.examples;
 
+import java.util.Arrays;
+
 import com.google.common.base.Objects;
 
 @SuppressWarnings("PMD")
@@ -31,7 +33,6 @@ public class BaseObject
 		}
 		final BaseObject other = (BaseObject) obj;
 		return Objects.equal(Element, other.Element)
-				&& Objects.equal(Elements, other.Elements);
+				&& Arrays.deepEquals(Elements, other.Elements);
 	}
-
 }

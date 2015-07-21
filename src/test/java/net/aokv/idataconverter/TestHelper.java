@@ -46,14 +46,15 @@ public final class TestHelper
 	public static IData createCompanyIData(final Company company)
 	{
 		int numberOfemployees = 0;
+		IData[] employees = null;
 		if (company.Employees != null)
 		{
 			numberOfemployees = company.Employees.size();
-		}
-		final IData[] employees = new IData[numberOfemployees];
-		for (int i = 0; i < employees.length; i++)
-		{
-			employees[i] = createPersonIData(company.Employees.get(i));
+			employees = new IData[numberOfemployees];
+			for (int i = 0; i < employees.length; i++)
+			{
+				employees[i] = createPersonIData(company.Employees.get(i));
+			}
 		}
 		String[] aList = null;
 		if (company.aList != null)

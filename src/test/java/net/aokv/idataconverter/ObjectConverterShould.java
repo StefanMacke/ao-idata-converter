@@ -56,11 +56,16 @@ public class ObjectConverterShould
 		assertThat(String.format("Value for key <%s> should be <%s>, but was <%s>.",
 				key, expectedValue, actualValue),
 				actualValue, is(expectedValue));
-		if (actualValue != null && expectedValue != null)
+		assertTypesEqual(actualValue, expectedValue);
+	}
+
+	private void assertTypesEqual(Object actual, Object expected)
+	{
+		if (actual != null && expected != null)
 		{
 			// make sure that also the types are identical (Object[] != String[])
 			// [ISC.0082.9030] Type mismatch, String expected'
-			assertThat(actualValue.getClass().toString(), is(expectedValue.getClass().toString()));
+			assertThat(actual.getClass().toString(), is(expected.getClass().toString()));
 		}
 	}
 
@@ -84,6 +89,7 @@ public class ObjectConverterShould
 			assertThat(String.format("Key at position %d should be <%s>, but was <%s>.",
 					keyCounter, expectedKey, actualKey),
 					actualKey, is(expectedKey));
+			assertTypesEqual(actualKey, expectedKey);
 		}
 		else
 		{
@@ -133,6 +139,22 @@ public class ObjectConverterShould
 	}
 
 	@Test
+	public void convertPrimitiveDataTypes() throws ObjectConversionException
+	{
+		IData idata = sut.convertToIData("int", 123);
+		assertIDataOnlyContains(idata, "int", "123");
+
+		idata = sut.convertToIData("double", 123.45);
+		assertIDataOnlyContains(idata, "double", "123.45");
+
+		idata = sut.convertToIData("bool", true);
+		assertIDataOnlyContains(idata, "bool", "true");
+
+		idata = sut.convertToIData("char", 'a');
+		assertIDataOnlyContains(idata, "char", "a");
+	}
+
+	@Test
 	public void convertEnumerations() throws ObjectConversionException
 	{
 		final IData idata = sut.convertToIData("country", Country.Germany);
@@ -153,13 +175,13 @@ public class ObjectConverterShould
 	{
 		IData idata = sut.convertToIData("array", new int[]
 		{ 1, 2, 3 });
-		assertIDataOnlyContains(idata, "array", new int[]
-		{ 1, 2, 3 });
+		assertIDataOnlyContains(idata, "array", new String[]
+		{ "1", "2", "3" });
 
 		idata = sut.convertToIData("array", new Double[]
 		{ 1.1, 2.2, 3.3 });
-		assertIDataOnlyContains(idata, "array", new Double[]
-		{ 1.1, 2.2, 3.3 });
+		assertIDataOnlyContains(idata, "array", new String[]
+		{ "1.1", "2.2", "3.3" });
 	}
 
 	@Test
@@ -170,6 +192,23 @@ public class ObjectConverterShould
 				{ "1", "2", "3" },
 				{ "4", "5", "6" },
 				{ "7", "8", "9" }
+		});
+		assertIDataOnlyContains(idata, "array", new String[][]
+		{
+				{ "1", "2", "3" },
+				{ "4", "5", "6" },
+				{ "7", "8", "9" }
+		});
+	}
+
+	@Test
+	public void convertTwoDimensionalPrimitiveArrays() throws ObjectConversionException
+	{
+		final IData idata = sut.convertToIData("array", new int[][]
+		{
+				{ 1, 2, 3 },
+				{ 4, 5, 6 },
+				{ 7, 8, 9 }
 		});
 		assertIDataOnlyContains(idata, "array", new String[][]
 		{
@@ -198,9 +237,9 @@ public class ObjectConverterShould
 		final Person personObject = createPerson("Stefan", "Macke");
 		final IData expected = createPersonIData(personObject);
 
-		final IData actual = sut.convertToIData(personObject);
+		final Object actual = sut.convertToIDataValue(personObject);
 
-		assertIDataEquals(actual, expected);
+		assertIDataEquals((IData) actual, expected);
 	}
 
 	@Test
@@ -218,6 +257,18 @@ public class ObjectConverterShould
 		{ person1, person2 });
 
 		assertIDataEquals(actual, expected);
+
+		IData[] actualArray = IDataUtil.getIDataArray(actual.getCursor(), "people");
+		IData[] expectedArray = IDataUtil.getIDataArray(expected.getCursor(), "people");
+		assertThat(actualArray.getClass().toString(), is(expectedArray.getClass().toString()));
+	}
+
+	@Test
+	public void convertEmptyObjectArrays() throws ObjectConversionException
+	{
+		final IData[] expected = new IData[0];
+		final IData actual = sut.convertToIData("people", new Person[] {});
+		assertIDataContains(actual, "people", expected);
 	}
 
 	@Test
@@ -234,12 +285,18 @@ public class ObjectConverterShould
 	}
 
 	@Test
+	public void convertEmptyStringArrays() throws ObjectConversionException
+	{
+		final String[] names = new String[0];
+		final IData actual = sut.convertToIData("names", names);
+		assertIDataOnlyContains(actual, "names", new String[] {});
+	}
+
+	@Test
 	public void convertEmptyStringLists() throws ObjectConversionException
 	{
 		final List<String> names = new ArrayList<>();
-
 		final IData actual = sut.convertToIData("names", names, String.class);
-
 		assertIDataOnlyContains(actual, "names", new String[] {});
 	}
 
@@ -258,16 +315,18 @@ public class ObjectConverterShould
 		{ person1, person2 }));
 
 		assertIDataEquals(actual, expected);
+
+		IData[] actualArray = IDataUtil.getIDataArray(actual.getCursor(), "people");
+		IData[] expectedArray = IDataUtil.getIDataArray(expected.getCursor(), "people");
+		assertThat(actualArray.getClass().toString(), is(expectedArray.getClass().toString()));
 	}
 
 	@Test
 	public void convertEmptyObjectLists() throws ObjectConversionException
 	{
-		final IData expected = createIData("people", new IData[] {});
-
+		final IData[] expected = new IData[0];
 		final IData actual = sut.convertToIData("people", new ArrayList<Person>());
-
-		assertIDataEquals(actual, expected);
+		assertIDataContains(actual, "people", expected);
 	}
 
 	@Test
@@ -303,6 +362,9 @@ public class ObjectConverterShould
 		companyObject.Employees = new ArrayList<>();
 		companyObject.Employees.add(employee1);
 		companyObject.Employees.add(employee2);
+		companyObject.EmployeesArray = new Person[]
+		{ employee1, employee2 };
+
 		final IData companyIData = createCompanyIData(companyObject);
 		final IData expected = createIData("company", companyIData);
 

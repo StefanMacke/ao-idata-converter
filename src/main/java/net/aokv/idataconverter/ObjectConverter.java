@@ -27,10 +27,19 @@ public class ObjectConverter extends Converter
 		return convertToIData(key, value, null);
 	}
 
-	public IData convertToIData(final Object value)
-			throws ObjectConversionException
+	public IData convertToIData(final Object value) throws ObjectConversionException
 	{
 		return (IData) convertObject(value);
+	}
+
+	public Object convertToIDataValue(final Object value)
+			throws ObjectConversionException
+	{
+		if (isPrimitiveType(value.getClass()))
+		{
+			return String.valueOf(value);
+		}
+		return convertObject(value);
 	}
 
 	private IData wrapInIData(final String key, final Object value)
@@ -52,21 +61,25 @@ public class ObjectConverter extends Converter
 
 		final Class<?> objectType = object.getClass();
 
-		if (isPrimitiveType(objectType))
-		{
-			return object;
-		}
-		if (objectType.isEnum())
-		{
-			return object.toString();
-		}
 		if (objectType.isArray())
 		{
+			if (isPrimitiveType(objectType.getComponentType()))
+			{
+				return convertToStringArray(object);
+			}
 			return convertArray((Object[]) object);
 		}
 		if (Collection.class.isAssignableFrom(objectType))
 		{
 			return convertCollection((Collection<?>) object, elementType);
+		}
+		if (isPrimitiveType(objectType))
+		{
+			return String.valueOf(object);
+		}
+		if (objectType.isEnum())
+		{
+			return object.toString();
 		}
 
 		return convertClass(object);
@@ -78,16 +91,82 @@ public class ObjectConverter extends Converter
 		return convertObject(object, null);
 	}
 
+	private String[] convertToStringArray(Object object)
+	{
+		int arrayLength = Array.getLength(object);
+		String[] array = new String[arrayLength];
+		for (int i = 0; i < arrayLength; i++)
+		{
+			array[i] = String.valueOf(Array.get(object, i));
+		}
+		return array;
+	}
+
 	private Object convertArray(final Object[] object)
 			throws ObjectConversionException
 	{
 		final int length = Array.getLength(object);
-		final IData[] elements = new IData[length];
+		final Object[] elements = new Object[length];
 		for (int i = 0; i < length; i++)
 		{
-			elements[i] = convertToIData(Array.get(object, i));
+			elements[i] = convertObject(Array.get(object, i));
+		}
+		if (isIDataArray(elements))
+		{
+			return convertIDataArray(elements);
+		}
+		if (isStringTable(elements))
+		{
+			return convertStringTable(elements);
+		}
+		if (elements.length == 0)
+		{
+			return new IData[0];
 		}
 		return elements;
+	}
+
+	private Object convertIDataArray(Object[] elements)
+	{
+		IData[] array = new IData[elements.length];
+		for (int i = 0; i < elements.length; i++)
+		{
+			array[i] = (IData) elements[i];
+		}
+		return array;
+	}
+
+	private boolean isIDataArray(Object[] elements)
+	{
+		return elements.length > 0 && elements[0] instanceof IData;
+	}
+
+	private boolean isStringTable(Object[] elements)
+	{
+		int outerLength = Array.getLength(elements);
+		if (outerLength == 0)
+		{
+			return false;
+		}
+		Object firstElement = elements[0];
+		return firstElement.getClass().isArray()
+				&& firstElement.getClass().getComponentType().equals(String.class);
+	}
+
+	private Object convertStringTable(Object[] elements)
+	{
+		int outerLength = Array.getLength(elements);
+		Object firstElement = elements[0];
+		int innerLength = Array.getLength(firstElement);
+		String[][] array = new String[outerLength][innerLength];
+		for (int o = 0; o < outerLength; o++)
+		{
+			for (int i = 0; i < innerLength; i++)
+			{
+				array[o][i] = (String) Array.get(Array.get(elements, o), i);
+			}
+		}
+		return array;
 	}
 
 	private Object convertCollection(final Collection<?> collection, final Class<?> elementType)

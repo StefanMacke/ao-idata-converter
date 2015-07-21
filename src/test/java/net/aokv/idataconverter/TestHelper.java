@@ -70,6 +70,7 @@ public final class TestHelper
 		final IDataCursor companyCursor = companyIData.getCursor();
 		IDataUtil.put(companyCursor, "AddressLines", company.Address);
 		IDataUtil.put(companyCursor, "Employees", employees);
+		IDataUtil.put(companyCursor, "EmployeesArray", employees);
 		IDataUtil.put(companyCursor, "Name", company.Name);
 		IDataUtil.put(companyCursor, "StockName", company.StockName);
 		IDataUtil.put(companyCursor, "aList", aList);
@@ -102,11 +103,11 @@ public final class TestHelper
 	{
 		final IData employeeIData = IDataFactory.create();
 		final IDataCursor employeeCursor = employeeIData.getCursor();
-		IDataUtil.put(employeeCursor, "Age", employee.Age);
+		IDataUtil.put(employeeCursor, "Age", String.valueOf(employee.Age));
 		IDataUtil.put(employeeCursor, "FirstName", employee.FirstName);
 		IDataUtil.put(employeeCursor, "LastName", employee.LastName);
-		IDataUtil.put(employeeCursor, "IsRetired", employee.getIsRetired());
-		IDataUtil.put(employeeCursor, "Salary", employee.getSalary());
+		IDataUtil.put(employeeCursor, "IsRetired", String.valueOf(employee.getIsRetired()));
+		IDataUtil.put(employeeCursor, "Salary", String.valueOf(employee.getSalary()));
 		return employeeIData;
 	}
 
@@ -115,7 +116,7 @@ public final class TestHelper
 		final IData input = IDataFactory.create();
 		final IDataCursor inputCursor = input.getCursor();
 		IDataUtil.put(inputCursor, "Text", wrapper.Input.Text);
-		IDataUtil.put(inputCursor, "TheNumber", wrapper.Input.getNumber());
+		IDataUtil.put(inputCursor, "TheNumber", String.valueOf(wrapper.Input.getNumber()));
 		inputCursor.destroy();
 		final IData output = IDataFactory.create();
 		final IDataCursor outputCursor = output.getCursor();

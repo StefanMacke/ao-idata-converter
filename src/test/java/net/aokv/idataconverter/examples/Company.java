@@ -26,6 +26,8 @@ public class Company
 
 	public List<Person> Employees;
 
+	public Person[] EmployeesArray;
+
 	public Boss getBoss()
 	{
 		return boss;
@@ -39,13 +41,20 @@ public class Company
 	@Override
 	public String toString()
 	{
-		return "Company [Name=" + Name + ", Address=" + Arrays.toString(Address) + ", aList = " + aList + ", anEmptyList = " + anEmptyList + ", StockName=" + StockName + ", boss=" + boss + ", Employees=" + Employees + "]";
+		return "Company [Name=" + Name
+				+ ", Address=" + Arrays.toString(Address)
+				+ ", aList = " + aList
+				+ ", anEmptyList = " + anEmptyList
+				+ ", StockName=" + StockName
+				+ ", boss=" + boss
+				+ ", Employees=" + Employees
+				+ ", EmployeesArray=" + EmployeesArray + "]";
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Objects.hashCode(Name, Address, aList, anEmptyList, StockName, boss, Employees);
+		return Objects.hashCode(Name, Address, aList, anEmptyList, StockName, boss, Employees, EmployeesArray);
 	}
 
 	@Override
@@ -70,6 +79,7 @@ public class Company
 				&& Objects.equal(aList, other.aList)
 				&& Objects.equal(anEmptyList, other.anEmptyList)
 				&& Objects.equal(boss, other.boss)
-				&& Objects.equal(Employees, other.Employees);
+				&& Objects.equal(Employees, other.Employees)
+				&& Objects.equal(EmployeesArray, other.EmployeesArray);
 	}
 }

@@ -13,11 +13,6 @@ public class Converter
 		{
 			return false;
 		}
-		if (objectType.isArray())
-		{
-			final Class<?> componentType = objectType.getComponentType();
-			return isPrimitiveType(componentType);
-		}
 		return objectType.equals(String.class)
 				|| objectType.equals(Object.class)
 				|| objectType.equals(Integer.TYPE)

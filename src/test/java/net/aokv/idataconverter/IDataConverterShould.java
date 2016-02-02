@@ -21,6 +21,14 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Before;
+import org.junit.Test;
+
+import com.wm.data.IData;
+import com.wm.data.IDataCursor;
+import com.wm.data.IDataFactory;
+import com.wm.data.IDataUtil;
+
 import net.aokv.idataconverter.examples.Address;
 import net.aokv.idataconverter.examples.BaseObject;
 import net.aokv.idataconverter.examples.Boss;
@@ -32,14 +40,7 @@ import net.aokv.idataconverter.examples.StockPrice;
 import net.aokv.idataconverter.examples.Wrapper;
 import net.aokv.idataconverter.examples.Wrapper.Input;
 import net.aokv.idataconverter.examples.Wrapper.Output;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import com.wm.data.IData;
-import com.wm.data.IDataCursor;
-import com.wm.data.IDataFactory;
-import com.wm.data.IDataUtil;
+import net.aokv.idataconverter.examples.customconverters.AddressCustomConverter;
 
 public class IDataConverterShould
 {
@@ -454,10 +455,31 @@ public class IDataConverterShould
 		final BaseObject baseObject = new BaseObject();
 		baseObject.Element = "Test";
 		baseObject.Elements = new Object[]
-				{ "Test", 123 };
+		{ "Test", 123 };
 
 		final IData baseObjectIData = createBaseObjectIData(baseObject);
 		final BaseObject actual = sut.convertToObject(baseObjectIData, BaseObject.class);
 		assertThat(actual, is(baseObject));
 	}
+
+	@Test
+	public void useCustomConverterIfPresent() throws IDataConversionException
+	{
+		final Address addressObject = new Address();
+		addressObject.setStreet("My Street 123");
+		addressObject.ZipCode = "12345";
+		addressObject.setCity("My City");
+		addressObject.country = Country.Germany;
+
+		final IData addressIData = IDataFactory.create();
+		final IDataCursor addressCursor = addressIData.getCursor();
+		IDataUtil.put(addressCursor, "ShortCity",
+				addressObject.country + "-" + addressObject.ZipCode + " " + addressObject.getCity());
+		IDataUtil.put(addressCursor, "ShortStreet", addressObject.getStreet());
+
+		sut.addCustomConverter(Address.class, new AddressCustomConverter());
+		final Address actual = sut.convertToObject(addressIData, Address.class);
+		assertThat(actual, is(addressObject));
+	}
+
 }

@@ -21,6 +21,15 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.Before;
+import org.junit.Test;
+
+import com.wm.data.IData;
+import com.wm.data.IDataCursor;
+import com.wm.data.IDataFactory;
+import com.wm.data.IDataFormatter;
+import com.wm.data.IDataUtil;
+
 import net.aokv.idataconverter.examples.Address;
 import net.aokv.idataconverter.examples.Boss;
 import net.aokv.idataconverter.examples.Company;
@@ -31,14 +40,7 @@ import net.aokv.idataconverter.examples.StockPrice;
 import net.aokv.idataconverter.examples.Wrapper;
 import net.aokv.idataconverter.examples.Wrapper.Input;
 import net.aokv.idataconverter.examples.Wrapper.Output;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import com.wm.data.IData;
-import com.wm.data.IDataCursor;
-import com.wm.data.IDataFormatter;
-import com.wm.data.IDataUtil;
+import net.aokv.idataconverter.examples.customconverters.AddressCustomConverter;
 
 public class ObjectConverterShould
 {
@@ -61,7 +63,7 @@ public class ObjectConverterShould
 		assertTypesEqual(actualValue, expectedValue);
 	}
 
-	private void assertTypesEqual(Object actual, Object expected)
+	private void assertTypesEqual(final Object actual, final Object expected)
 	{
 		if (actual != null && expected != null)
 		{
@@ -260,8 +262,8 @@ public class ObjectConverterShould
 
 		assertIDataEquals(actual, expected);
 
-		IData[] actualArray = IDataUtil.getIDataArray(actual.getCursor(), "people");
-		IData[] expectedArray = IDataUtil.getIDataArray(expected.getCursor(), "people");
+		final IData[] actualArray = IDataUtil.getIDataArray(actual.getCursor(), "people");
+		final IData[] expectedArray = IDataUtil.getIDataArray(expected.getCursor(), "people");
 		assertThat(actualArray.getClass().toString(), is(expectedArray.getClass().toString()));
 	}
 
@@ -318,8 +320,8 @@ public class ObjectConverterShould
 
 		assertIDataEquals(actual, expected);
 
-		IData[] actualArray = IDataUtil.getIDataArray(actual.getCursor(), "people");
-		IData[] expectedArray = IDataUtil.getIDataArray(expected.getCursor(), "people");
+		final IData[] actualArray = IDataUtil.getIDataArray(actual.getCursor(), "people");
+		final IData[] expectedArray = IDataUtil.getIDataArray(expected.getCursor(), "people");
 		assertThat(actualArray.getClass().toString(), is(expectedArray.getClass().toString()));
 	}
 
@@ -437,9 +439,32 @@ public class ObjectConverterShould
 	@Test
 	public void convertDates() throws Exception
 	{
-		Date date = new SimpleDateFormat("yyyy-MM-dd").parse("2015-01-01");
+		final Date date = new SimpleDateFormat("yyyy-MM-dd").parse("2015-01-01");
 		final IData expected = createIData("date", "2015-01-01");
 		final IData actual = sut.convertToIData("date", date);
+		assertIDataEquals(actual, expected);
+	}
+
+	@Test
+	public void useCustomConverterIfPresent() throws Exception
+	{
+		final Address addressObject = new Address();
+		addressObject.setStreet("My Street 123");
+		addressObject.ZipCode = "12345";
+		addressObject.setCity("My City");
+		addressObject.country = Country.Germany;
+
+		final IData addressIData = IDataFactory.create();
+		final IDataCursor addressCursor = addressIData.getCursor();
+		IDataUtil.put(addressCursor, "ShortStreet", addressObject.getStreet());
+		IDataUtil.put(addressCursor, "ShortCity",
+				addressObject.country.toString() + "-" + addressObject.ZipCode + " " + addressObject.getCity());
+
+		final IData expected = createIData("address", addressIData);
+
+		sut.addCustomConverter(Address.class, new AddressCustomConverter());
+		final IData actual = sut.convertToIData("address", addressObject);
+
 		assertIDataEquals(actual, expected);
 	}
 

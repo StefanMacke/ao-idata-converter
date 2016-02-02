@@ -3,10 +3,30 @@ package net.aokv.idataconverter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 
 public class Converter
 {
+	private final Map<Class<?>, CustomConverter<?>> customConverters;
+
+	protected Converter()
+	{
+		customConverters = new HashMap<Class<?>, CustomConverter<?>>();
+	}
+
+	public <T> void addCustomConverter(final Class<T> clazz, final CustomConverter<T> converter)
+	{
+		customConverters.put(clazz, converter);
+	}
+
+	protected Optional<CustomConverter<?>> getCustomConverter(final Class<?> clazz)
+	{
+		return Optional.ofNullable(customConverters.get(clazz));
+	}
+
 	protected <T> boolean isPrimitiveType(final Class<T> objectType)
 	{
 		if (objectType == null)
@@ -87,7 +107,7 @@ public class Converter
 
 	protected Field getField(
 			final Class<?> objectType, final String originalFieldName, final String fieldName)
-			throws NoSuchFieldException
+					throws NoSuchFieldException
 	{
 		Field field = getField(objectType, originalFieldName);
 		if (field == null)

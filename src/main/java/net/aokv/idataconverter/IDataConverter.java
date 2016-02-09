@@ -27,11 +27,6 @@ public class IDataConverter extends Converter
 		{
 			return null;
 		}
-		final Optional<CustomConverter<?>> customConverter = getCustomConverter(objectType);
-		if (customConverter.isPresent())
-		{
-			return (T) customConverter.get().convertToObject((IData) iData);
-		}
 		if (isPrimitiveType(objectType))
 		{
 			if (objectType.equals(iData.getClass()))
@@ -47,6 +42,11 @@ public class IDataConverter extends Converter
 
 		try
 		{
+			final Optional<CustomConverter<?>> customConverter = findCustomConverter(objectType, objectType);
+			if (customConverter.isPresent())
+			{
+				return (T) customConverter.get().convertToObject((IData) iData);
+			}
 			if (objectType.isArray())
 			{
 				return convertArray(iData, objectType);
@@ -54,7 +54,7 @@ public class IDataConverter extends Converter
 
 			return convertObject((IData) iData, objectType);
 		}
-		catch (final IDataConversionException e)
+		catch (final Exception e)
 		{
 			throw createException(iData, objectType, e);
 		}
@@ -191,6 +191,20 @@ public class IDataConverter extends Converter
 		return (T) collection;
 	}
 
+	@SuppressWarnings("unchecked")
+	private <T> T convertField(final IData iData, final String fieldName, final Class<T> fieldType,
+			final Class<?> elementType, final Optional<CustomConverter<?>> customConverter)
+					throws IDataConversionException
+	{
+		if (customConverter.isPresent())
+		{
+			final CustomConverter<?> cc = customConverter.get();
+			final IDataCursor idc = iData.getCursor();
+			return (T) cc.convertToObject((IData) IDataUtil.get(idc, fieldName));
+		}
+		return convertFieldOrCollection(iData, fieldName, fieldType, elementType);
+	}
+
 	private <T> T convertFieldOrCollection(
 			final IData iData, final String fieldName, final Class<T> fieldType, final Class<?> elementType)
 					throws IDataConversionException
@@ -273,18 +287,18 @@ public class IDataConverter extends Converter
 			{
 				final String fieldName = generateFieldName(field, field.getName());
 				final Class<?> fieldType = field.getType();
-				final Class<?> elementType = findelementType(field, fieldType);
-
-				field.set(instance, convertFieldOrCollection(iData, fieldName, fieldType, elementType));
+				final Class<?> elementType = findElementType(field, fieldType);
+				final Optional<CustomConverter<?>> customConverter = findCustomConverter(field, fieldType);
+				field.set(instance, convertField(iData, fieldName, fieldType, elementType, customConverter));
 			}
 		}
-		catch (IllegalArgumentException | IllegalAccessException e)
+		catch (final Exception e)
 		{
 			throw new IDataConversionException(e.getMessage(), e);
 		}
 	}
 
-	private Class<?> findelementType(final Field field, final Class<?> fieldType)
+	private Class<?> findElementType(final Field field, final Class<?> fieldType)
 	{
 		Class<?> elementType = null;
 		if (Collection.class.isAssignableFrom(fieldType))
@@ -306,7 +320,7 @@ public class IDataConverter extends Converter
 				final Field field = findField(method, objectType);
 				final String fieldName = generateFieldName(field, method.getName().substring(3));
 				final Class<?> fieldType = field.getType();
-				final Class<?> elementType = findelementType(field, fieldType);
+				final Class<?> elementType = findElementType(field, fieldType);
 				final Object fieldValue = convertToObject(iData, fieldName, fieldType, elementType);
 				method.invoke(instance, fieldValue);
 			}

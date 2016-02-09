@@ -36,6 +36,10 @@ logger.debug('buildscript configuration activated')
 
 repositories.each { logger.info("Repository $it.name") }
 
+jar {
+     from sourceSets.main.allSource
+}
+
 dependencies {
 	compile "com.google.guava:guava:17.0",
 		"com.wm:is-client:9.5", // must be added to local repository

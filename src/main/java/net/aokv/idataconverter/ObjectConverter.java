@@ -64,38 +64,44 @@ public class ObjectConverter extends Converter
 
 		final Class<?> objectType = object.getClass();
 
-		final Optional<CustomConverter<?>> cc = getCustomConverter(objectType);
-		if (cc.isPresent())
+		try
 		{
-			return cc.get().convertToIData(object);
-		}
-
-		if (objectType.isArray())
-		{
-			if (isPrimitiveType(objectType.getComponentType()))
+			final Optional<CustomConverter<?>> cc = findCustomConverter(objectType, objectType);
+			if (cc.isPresent())
 			{
-				return convertToStringArray(object);
+				return cc.get().convertToIData(object);
 			}
-			return convertArray((Object[]) object);
-		}
-		if (Collection.class.isAssignableFrom(objectType))
-		{
-			return convertCollection((Collection<?>) object, elementType);
-		}
-		if (isPrimitiveType(objectType))
-		{
-			return String.valueOf(object);
-		}
-		if (objectType.isEnum())
-		{
-			return object.toString();
-		}
-		if (objectType.equals(Date.class))
-		{
-			return new SimpleDateFormat("yyyy-MM-dd").format((Date) object);
-		}
+			if (objectType.isArray())
+			{
+				if (isPrimitiveType(objectType.getComponentType()))
+				{
+					return convertToStringArray(object);
+				}
+				return convertArray((Object[]) object);
+			}
+			if (Collection.class.isAssignableFrom(objectType))
+			{
+				return convertCollection((Collection<?>) object, elementType);
+			}
+			if (isPrimitiveType(objectType))
+			{
+				return String.valueOf(object);
+			}
+			if (objectType.isEnum())
+			{
+				return object.toString();
+			}
+			if (objectType.equals(Date.class))
+			{
+				return new SimpleDateFormat("yyyy-MM-dd").format((Date) object);
+			}
 
-		return convertClass(object);
+			return convertClass(object);
+		}
+		catch (final Exception e)
+		{
+			throw new ObjectConversionException(e.getMessage(), e);
+		}
 	}
 
 	private Object convertObject(final Object object)
@@ -240,11 +246,21 @@ public class ObjectConverter extends Converter
 				final String fieldName = generateFieldName(field, field.getName());
 				final Object fieldValue = field.get(object);
 				final Class<?> elementType = getParameterType(field);
-				final Object fieldData = convertObject(fieldValue, elementType);
+				final Optional<CustomConverter<?>> cc = findCustomConverter(field, field.getClass());
+				Object fieldData = null;
+				// TODO
+				if (cc.isPresent())
+				{
+					fieldData = cc.get().convertToIData(fieldValue);
+				}
+				else
+				{
+					fieldData = convertObject(fieldValue, elementType);
+				}
 				idc.insertAfter(fieldName, fieldData);
 			}
 		}
-		catch (IllegalArgumentException | IllegalAccessException e)
+		catch (final Exception e)
 		{
 			throw new ObjectConversionException(e.getMessage(), e);
 		}

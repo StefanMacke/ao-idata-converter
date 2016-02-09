@@ -7,8 +7,8 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(
-{ ElementType.FIELD })
-public @interface PipelineName
+{ ElementType.FIELD, ElementType.TYPE })
+public @interface UseCustomConverter
 {
-	String value();
+	Class<? extends CustomConverter<?>> value();
 }

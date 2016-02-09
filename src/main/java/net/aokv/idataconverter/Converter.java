@@ -1,5 +1,6 @@
 package net.aokv.idataconverter;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -22,9 +23,20 @@ public class Converter
 		customConverters.put(clazz, converter);
 	}
 
-	protected Optional<CustomConverter<?>> getCustomConverter(final Class<?> clazz)
+	protected Optional<CustomConverter<?>> findCustomConverter(
+			final AnnotatedElement element, final Class<?> clazz)
+					throws Exception
 	{
-		return Optional.ofNullable(customConverters.get(clazz));
+		CustomConverter<?> cc = customConverters.get(clazz);
+		if (cc == null)
+		{
+			if (element.isAnnotationPresent(UseCustomConverter.class))
+			{
+				final Class<?> ccClass = element.getAnnotation(UseCustomConverter.class).value();
+				cc = (CustomConverter<?>) ccClass.newInstance();
+			}
+		}
+		return Optional.ofNullable(cc);
 	}
 
 	protected <T> boolean isPrimitiveType(final Class<T> objectType)

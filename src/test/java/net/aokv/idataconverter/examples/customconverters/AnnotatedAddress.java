@@ -1,11 +1,13 @@
-package net.aokv.idataconverter.examples;
+package net.aokv.idataconverter.examples.customconverters;
 
 import com.google.common.base.Objects;
 
 import net.aokv.idataconverter.PipelineName;
+import net.aokv.idataconverter.UseCustomConverter;
+import net.aokv.idataconverter.examples.Country;
 
-@SuppressWarnings("PMD")
-public class Address
+@UseCustomConverter(AnnotatedAddressCustomConverter.class)
+public class AnnotatedAddress
 {
 	private String street;
 
@@ -63,11 +65,10 @@ public class Address
 		{
 			return false;
 		}
-		final Address other = (Address) obj;
+		final AnnotatedAddress other = (AnnotatedAddress) obj;
 		return Objects.equal(street, other.street)
 				&& Objects.equal(ZipCode, other.ZipCode)
 				&& Objects.equal(city, other.city)
 				&& Objects.equal(country, other.country);
 	}
-
 }

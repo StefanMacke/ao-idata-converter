@@ -1,18 +1,21 @@
 package net.aokv.idataconverter;
 
-import net.aokv.idataconverter.examples.Address;
-import net.aokv.idataconverter.examples.BaseObject;
-import net.aokv.idataconverter.examples.Boss;
-import net.aokv.idataconverter.examples.Company;
-import net.aokv.idataconverter.examples.Employee;
-import net.aokv.idataconverter.examples.Person;
-import net.aokv.idataconverter.examples.StockPrice;
-import net.aokv.idataconverter.examples.Wrapper;
-
 import com.wm.data.IData;
 import com.wm.data.IDataCursor;
 import com.wm.data.IDataFactory;
 import com.wm.data.IDataUtil;
+
+import net.aokv.idataconverter.examples.Address;
+import net.aokv.idataconverter.examples.BaseObject;
+import net.aokv.idataconverter.examples.Boss;
+import net.aokv.idataconverter.examples.Company;
+import net.aokv.idataconverter.examples.Country;
+import net.aokv.idataconverter.examples.Employee;
+import net.aokv.idataconverter.examples.Person;
+import net.aokv.idataconverter.examples.StockPrice;
+import net.aokv.idataconverter.examples.Wrapper;
+import net.aokv.idataconverter.examples.customconverters.AnnotatedAddress;
+import net.aokv.idataconverter.examples.customconverters.CustomWrapper;
 
 public final class TestHelper
 {
@@ -100,6 +103,16 @@ public final class TestHelper
 		return addressIData;
 	}
 
+	public static IData createShortAddressIData(final Address address)
+	{
+		final IData addressIData = IDataFactory.create();
+		final IDataCursor addressCursor = addressIData.getCursor();
+		IDataUtil.put(addressCursor, "ShortStreet", address.getStreet());
+		IDataUtil.put(addressCursor, "ShortCity",
+				address.country + "-" + address.ZipCode + " " + address.getCity());
+		return addressIData;
+	}
+
 	public static IData createEmployeeIData(final Employee employee)
 	{
 		final IData employeeIData = IDataFactory.create();
@@ -129,6 +142,16 @@ public final class TestHelper
 		IDataUtil.put(expectedCursor, "Output", output);
 		expectedCursor.destroy();
 		return expected;
+	}
+
+	public static IData createCustomWrapperIData(final CustomWrapper customWrapper)
+	{
+		final IData input = IDataFactory.create();
+		final IDataCursor inputCursor = input.getCursor();
+		IDataUtil.put(inputCursor, "Address", TestHelper.createShortAddressIData(customWrapper.Address));
+		IDataUtil.put(inputCursor, "test", customWrapper.test);
+		inputCursor.destroy();
+		return input;
 	}
 
 	public static IData createBaseObjectIData(final BaseObject baseobject)
@@ -176,6 +199,27 @@ public final class TestHelper
 		employee.setSalary(salary);
 		employee.setIsRetired(isRetired);
 		return employee;
+	}
+
+	public static Address createExampleAddress()
+	{
+		final Address addressObject = new Address();
+		addressObject.setStreet("My Street 123");
+		addressObject.ZipCode = "12345";
+		addressObject.setCity("My City");
+		addressObject.country = Country.Germany;
+		return addressObject;
+	}
+
+	public static AnnotatedAddress createExampleAnnotatedAddress()
+	{
+		final Address addressObject = createExampleAddress();
+		final AnnotatedAddress aa = new AnnotatedAddress();
+		aa.setStreet(addressObject.getStreet());
+		aa.ZipCode = addressObject.ZipCode;
+		aa.setCity(addressObject.getCity());
+		aa.country = addressObject.country;
+		return aa;
 	}
 
 }

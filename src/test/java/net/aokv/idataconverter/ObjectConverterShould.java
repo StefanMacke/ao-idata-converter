@@ -41,6 +41,8 @@ import net.aokv.idataconverter.examples.Wrapper;
 import net.aokv.idataconverter.examples.Wrapper.Input;
 import net.aokv.idataconverter.examples.Wrapper.Output;
 import net.aokv.idataconverter.examples.customconverters.AddressCustomConverter;
+import net.aokv.idataconverter.examples.customconverters.AnnotatedAddress;
+import net.aokv.idataconverter.examples.customconverters.CustomWrapper;
 
 public class ObjectConverterShould
 {
@@ -394,11 +396,7 @@ public class ObjectConverterShould
 	@Test
 	public void useGettersAndSettersIfPresentAfterUsingFields() throws Exception
 	{
-		final Address addressObject = new Address();
-		addressObject.setStreet("My Street 123");
-		addressObject.ZipCode = "12345";
-		addressObject.setCity("My City");
-		addressObject.country = Country.Germany;
+		final Address addressObject = TestHelper.createExampleAddress();
 		final IData addressIData = createAddressIData(addressObject);
 		final IData expected = createIData("address", addressIData);
 
@@ -448,11 +446,7 @@ public class ObjectConverterShould
 	@Test
 	public void useCustomConverterIfPresent() throws Exception
 	{
-		final Address addressObject = new Address();
-		addressObject.setStreet("My Street 123");
-		addressObject.ZipCode = "12345";
-		addressObject.setCity("My City");
-		addressObject.country = Country.Germany;
+		final Address addressObject = TestHelper.createExampleAddress();
 
 		final IData addressIData = IDataFactory.create();
 		final IDataCursor addressCursor = addressIData.getCursor();
@@ -464,6 +458,31 @@ public class ObjectConverterShould
 
 		sut.addCustomConverter(Address.class, new AddressCustomConverter());
 		final IData actual = sut.convertToIData("address", addressObject);
+
+		assertIDataEquals(actual, expected);
+	}
+
+	@Test
+	public void useCustomConverterForAnnotatedFields() throws Exception
+	{
+		final Address addressObject = TestHelper.createExampleAddress();
+		final CustomWrapper wrapper = new CustomWrapper();
+		wrapper.Address = addressObject;
+		wrapper.test = "A test string";
+
+		final IData expected = TestHelper.createCustomWrapperIData(wrapper);
+		final IData actual = sut.convertToIData(wrapper);
+
+		assertIDataEquals(actual, expected);
+	}
+
+	@Test
+	public void useCustomConverterForAnnotatedClasses() throws Exception
+	{
+		final AnnotatedAddress addressObject = TestHelper.createExampleAnnotatedAddress();
+
+		final IData expected = TestHelper.createShortAddressIData(TestHelper.createExampleAddress());
+		final IData actual = sut.convertToIData(addressObject);
 
 		assertIDataEquals(actual, expected);
 	}

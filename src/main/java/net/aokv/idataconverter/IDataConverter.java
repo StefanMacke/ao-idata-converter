@@ -205,6 +205,10 @@ public class IDataConverter extends Converter
 		{
 			final CustomConverter<?> cc = customConverter.get();
 			final IData fieldValue = (IData) IDataUtil.get(idc, fieldName);
+			if (fieldValue == null)
+			{
+				return null;
+			}
 			return (T) cc.convertToObject(fieldValue);
 		}
 		return convertFieldOrCollection(iData, fieldName, fieldType, elementType);

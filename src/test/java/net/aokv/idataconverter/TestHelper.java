@@ -1,5 +1,7 @@
 package net.aokv.idataconverter;
 
+import java.util.Arrays;
+
 import com.wm.data.IData;
 import com.wm.data.IDataCursor;
 import com.wm.data.IDataFactory;
@@ -149,6 +151,10 @@ public final class TestHelper
 		final IData input = IDataFactory.create();
 		final IDataCursor inputCursor = input.getCursor();
 		IDataUtil.put(inputCursor, "Address", TestHelper.createShortAddressIData(customWrapper.Address));
+		final IData[] adresses = Arrays.stream(customWrapper.Addresses)
+				.map(TestHelper::createShortAddressIData)
+				.toArray(size -> new IData[size]);
+		IDataUtil.put(inputCursor, "Addresses", adresses);
 		IDataUtil.put(inputCursor, "test", customWrapper.test);
 		inputCursor.destroy();
 		return input;

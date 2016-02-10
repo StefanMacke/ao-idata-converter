@@ -477,6 +477,8 @@ public class IDataConverterShould
 		final Address addressObject = TestHelper.createExampleAddress();
 		final CustomWrapper expected = new CustomWrapper();
 		expected.Address = addressObject;
+		expected.Addresses = new Address[]
+		{ TestHelper.createExampleAddress(), TestHelper.createExampleAddress() };
 		expected.test = "A test string";
 
 		final IData input = TestHelper.createCustomWrapperIData(expected);

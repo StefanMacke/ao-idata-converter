@@ -66,22 +66,22 @@ public class ObjectConverter extends Converter
 
 		try
 		{
-			final Optional<CustomConverter<?>> cc = findCustomConverter(objectType, objectType);
-			if (cc.isPresent())
-			{
-				return cc.get().convertToIData(object);
-			}
+			final Optional<CustomConverter<?>> customConverter = findCustomConverter(objectType, objectType);
 			if (objectType.isArray())
 			{
 				if (isPrimitiveType(objectType.getComponentType()))
 				{
 					return convertToStringArray(object);
 				}
-				return convertArray((Object[]) object);
+				return convertArray((Object[]) object, customConverter);
+			}
+			if (customConverter.isPresent())
+			{
+				return customConverter.get().convertToIData(object);
 			}
 			if (Collection.class.isAssignableFrom(objectType))
 			{
-				return convertCollection((Collection<?>) object, elementType);
+				return convertCollection((Collection<?>) object, elementType, customConverter);
 			}
 			if (isPrimitiveType(objectType))
 			{
@@ -121,14 +121,21 @@ public class ObjectConverter extends Converter
 		return array;
 	}
 
-	private Object convertArray(final Object[] object)
+	private Object convertArray(final Object[] object, final Optional<CustomConverter<?>> customConverter)
 			throws ObjectConversionException
 	{
 		final int length = Array.getLength(object);
 		final Object[] elements = new Object[length];
 		for (int i = 0; i < length; i++)
 		{
-			elements[i] = convertObject(Array.get(object, i));
+			if (customConverter.isPresent())
+			{
+				elements[i] = customConverter.get().convertToIData(Array.get(object, i));
+			}
+			else
+			{
+				elements[i] = convertObject(Array.get(object, i));
+			}
 		}
 		if (isIDataArray(elements))
 		{
@@ -188,8 +195,11 @@ public class ObjectConverter extends Converter
 		return array;
 	}
 
-	private Object convertCollection(final Collection<?> collection, final Class<?> elementType)
-			throws ObjectConversionException
+	private Object convertCollection(
+			final Collection<?> collection,
+			final Class<?> elementType,
+			final Optional<CustomConverter<?>> customConverter)
+					throws ObjectConversionException
 	{
 		final Object[] array = collection.toArray(new Object[collection.size()]);
 		if (array.length == 0 && isPrimitiveType(elementType)
@@ -197,7 +207,7 @@ public class ObjectConverter extends Converter
 		{
 			return convertCollectionToArray(collection, elementType);
 		}
-		return convertArray(array);
+		return convertArray(array, customConverter);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -246,12 +256,18 @@ public class ObjectConverter extends Converter
 				final String fieldName = generateFieldName(field, field.getName());
 				final Object fieldValue = field.get(object);
 				final Class<?> elementType = getParameterType(field);
-				final Optional<CustomConverter<?>> cc = findCustomConverter(field, field.getClass());
+				final Optional<CustomConverter<?>> customConverter = findCustomConverter(field, field.getClass());
 				Object fieldData = null;
-				// TODO
-				if (cc.isPresent())
+				if (customConverter.isPresent())
 				{
-					fieldData = cc.get().convertToIData(fieldValue);
+					if (field.getType().isArray())
+					{
+						fieldData = convertArray((Object[]) fieldValue, customConverter);
+					}
+					else
+					{
+						fieldData = customConverter.get().convertToIData(fieldValue);
+					}
 				}
 				else
 				{

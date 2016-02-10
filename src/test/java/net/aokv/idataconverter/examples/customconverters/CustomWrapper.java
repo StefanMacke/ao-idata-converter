@@ -11,6 +11,9 @@ public class CustomWrapper
 	@UseCustomConverter(AddressCustomConverter.class)
 	public Address Address;
 
+	@UseCustomConverter(AddressCustomConverter.class)
+	public Address[] Addresses;
+
 	public String test;
 
 	@Override

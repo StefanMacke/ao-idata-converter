@@ -43,15 +43,14 @@ public class IDataConverter extends Converter
 		try
 		{
 			final Optional<CustomConverter<?>> customConverter = findCustomConverter(objectType, objectType);
+			if (objectType.isArray())
+			{
+				return convertArray(iData, objectType, customConverter);
+			}
 			if (customConverter.isPresent())
 			{
 				return (T) customConverter.get().convertToObject((IData) iData);
 			}
-			if (objectType.isArray())
-			{
-				return convertArray(iData, objectType);
-			}
-
 			return convertObject((IData) iData, objectType);
 		}
 		catch (final Exception e)
@@ -196,11 +195,17 @@ public class IDataConverter extends Converter
 			final Class<?> elementType, final Optional<CustomConverter<?>> customConverter)
 					throws IDataConversionException
 	{
+		final IDataCursor idc = iData.getCursor();
+		if (fieldType.isArray())
+		{
+			final Object fieldValue = IDataUtil.get(idc, fieldName);
+			return convertArray(fieldValue, fieldType, customConverter);
+		}
 		if (customConverter.isPresent())
 		{
 			final CustomConverter<?> cc = customConverter.get();
-			final IDataCursor idc = iData.getCursor();
-			return (T) cc.convertToObject((IData) IDataUtil.get(idc, fieldName));
+			final IData fieldValue = (IData) IDataUtil.get(idc, fieldName);
+			return (T) cc.convertToObject(fieldValue);
 		}
 		return convertFieldOrCollection(iData, fieldName, fieldType, elementType);
 	}
@@ -248,15 +253,28 @@ public class IDataConverter extends Converter
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> T convertArray(final Object object, final Class<T> objectType)
-			throws IDataConversionException
+	private <T> T convertArray(
+			final Object object, final Class<T> objectType, final Optional<CustomConverter<?>> customConverter)
+					throws IDataConversionException
 	{
+		if (object == null)
+		{
+			return null;
+		}
 		final int length = Array.getLength(object);
 		final Class<?> componentType = objectType.getComponentType();
 		final Object array = Array.newInstance(componentType, length);
 		for (int i = 0; i < length; i++)
 		{
-			final Object value = convertToObject(Array.get(object, i), componentType);
+			Object value = null;
+			if (customConverter.isPresent())
+			{
+				value = customConverter.get().convertToObject((IData) Array.get(object, i));
+			}
+			else
+			{
+				value = convertToObject(Array.get(object, i), componentType);
+			}
 			Array.set(array, i, value);
 		}
 		return (T) array;

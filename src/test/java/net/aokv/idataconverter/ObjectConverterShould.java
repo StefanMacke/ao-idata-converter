@@ -468,6 +468,8 @@ public class ObjectConverterShould
 		final Address addressObject = TestHelper.createExampleAddress();
 		final CustomWrapper wrapper = new CustomWrapper();
 		wrapper.Address = addressObject;
+		wrapper.Addresses = new Address[]
+		{ TestHelper.createExampleAddress(), TestHelper.createExampleAddress() };
 		wrapper.test = "A test string";
 
 		final IData expected = TestHelper.createCustomWrapperIData(wrapper);

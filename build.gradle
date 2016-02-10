@@ -25,7 +25,6 @@ logger.debug('buildscript configuration activated')
 	"java",
 	"eclipse",
 	"junit4",
-	"mockito",
 	"checkstyle",
 	"findbugs",
 	"pmd",
@@ -40,10 +39,13 @@ jar {
      from sourceSets.main.allSource
 }
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.11'
+}
+
 dependencies {
-	compile "com.google.guava:guava:17.0",
+	compile "com.google.guava:guava:19.0",
 		"com.wm:is-client:9.5", // must be added to local repository
 		"com.wm:is-server:9.5", // must be added to local repository
 		"com.entrust.toolkit:enttoolkit:8.0.23" // must be added to local repository
-	checkstyle 'com.puppycrawl.tools:checkstyle:5.8'
 }

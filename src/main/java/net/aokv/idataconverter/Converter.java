@@ -105,15 +105,15 @@ public class Converter
 				.toArray(Method[]::new);
 	}
 
-	private Field getField(final Class<?> objectType, final String fieldName)
+	private Optional<Field> getField(final Class<?> objectType, final String fieldName)
 	{
 		try
 		{
-			return objectType.getDeclaredField(fieldName);
+			return Optional.of(objectType.getDeclaredField(fieldName));
 		}
 		catch (final NoSuchFieldException e)
 		{
-			return null;
+			return Optional.empty();
 		}
 	}
 
@@ -121,21 +121,18 @@ public class Converter
 			final Class<?> objectType, final String originalFieldName, final String fieldName)
 					throws NoSuchFieldException
 	{
-		Field field = getField(objectType, originalFieldName);
-		if (field == null)
+		Optional<Field> field = getField(objectType, originalFieldName);
+		if (!field.isPresent())
 		{
 			field = getField(objectType, fieldName);
 		}
-		if (field == null)
+		if (!field.isPresent())
 		{
 			throw new NoSuchFieldException(String.format(
 					"Field <%s> not found for class <%s>",
 					originalFieldName, objectType));
 		}
-		else
-		{
-			return field;
-		}
+		return field.get();
 	}
 
 	protected Field findField(final Method method, final Class<?> objectType)

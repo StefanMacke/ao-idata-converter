@@ -148,16 +148,16 @@ public class ObjectConverterShould
 	public void convertPrimitiveDataTypes() throws Exception
 	{
 		IData idata = sut.convertToIData("int", 123);
-		assertIDataOnlyContains(idata, "int", "123");
+		assertIDataOnlyContains(idata, "int", 123);
 
 		idata = sut.convertToIData("double", 123.45);
-		assertIDataOnlyContains(idata, "double", "123.45");
+		assertIDataOnlyContains(idata, "double", 123.45);
 
 		idata = sut.convertToIData("bool", true);
-		assertIDataOnlyContains(idata, "bool", "true");
+		assertIDataOnlyContains(idata, "bool", true);
 
 		idata = sut.convertToIData("char", 'a');
-		assertIDataOnlyContains(idata, "char", "a");
+		assertIDataOnlyContains(idata, "char", 'a');
 	}
 
 	@Test
@@ -181,13 +181,18 @@ public class ObjectConverterShould
 	{
 		IData idata = sut.convertToIData("array", new int[]
 		{ 1, 2, 3 });
-		assertIDataOnlyContains(idata, "array", new String[]
-		{ "1", "2", "3" });
+		assertIDataOnlyContains(idata, "array", new int[]
+		{ 1, 2, 3 });
 
 		idata = sut.convertToIData("array", new Double[]
 		{ 1.1, 2.2, 3.3 });
-		assertIDataOnlyContains(idata, "array", new String[]
-		{ "1.1", "2.2", "3.3" });
+		assertIDataOnlyContains(idata, "array", new Double[]
+		{ 1.1, 2.2, 3.3 });
+
+		idata = sut.convertToIData("array", new byte[]
+		{ 1, 2, 3 });
+		assertIDataOnlyContains(idata, "array", new byte[]
+		{ 1, 2, 3 });
 	}
 
 	@Test
@@ -216,11 +221,11 @@ public class ObjectConverterShould
 				{ 4, 5, 6 },
 				{ 7, 8, 9 }
 		});
-		assertIDataOnlyContains(idata, "array", new String[][]
+		assertIDataOnlyContains(idata, "array", new int[][]
 		{
-				{ "1", "2", "3" },
-				{ "4", "5", "6" },
-				{ "7", "8", "9" }
+				{ 1, 2, 3 },
+				{ 4, 5, 6 },
+				{ 7, 8, 9 }
 		});
 	}
 

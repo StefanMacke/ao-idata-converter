@@ -25,7 +25,7 @@ public class Converter
 
 	protected Optional<CustomConverter<?>> findCustomConverter(
 			final AnnotatedElement element, final Class<?> clazz)
-					throws Exception
+			throws Exception
 	{
 		CustomConverter<?> cc = customConverters.get(clazz);
 		if (cc == null)
@@ -62,7 +62,15 @@ public class Converter
 				|| objectType.equals(Float.class)
 				|| objectType.equals(Double.class)
 				|| objectType.equals(Character.class)
-				|| objectType.equals(Boolean.class);
+				|| objectType.equals(Boolean.class)
+				|| objectType.equals(int[].class)
+				|| objectType.equals(short[].class)
+				|| objectType.equals(byte[].class)
+				|| objectType.equals(long[].class)
+				|| objectType.equals(float[].class)
+				|| objectType.equals(double[].class)
+				|| objectType.equals(char[].class)
+				|| objectType.equals(boolean[].class);
 	}
 
 	protected String generateFieldName(final Field field, final String originalFieldName)
@@ -119,7 +127,7 @@ public class Converter
 
 	protected Field getField(
 			final Class<?> objectType, final String originalFieldName, final String fieldName)
-					throws NoSuchFieldException
+			throws NoSuchFieldException
 	{
 		Optional<Field> field = getField(objectType, originalFieldName);
 		if (!field.isPresent())

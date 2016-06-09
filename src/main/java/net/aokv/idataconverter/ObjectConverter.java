@@ -40,7 +40,7 @@ public class ObjectConverter extends Converter
 	{
 		if (isPrimitiveType(value.getClass()))
 		{
-			return String.valueOf(value);
+			return value;
 		}
 		return convertObject(value);
 	}
@@ -71,7 +71,7 @@ public class ObjectConverter extends Converter
 			{
 				if (isPrimitiveType(objectType.getComponentType()))
 				{
-					return convertToStringArray(object);
+					return object;
 				}
 				return convertArray((Object[]) object, customConverter);
 			}
@@ -85,7 +85,7 @@ public class ObjectConverter extends Converter
 			}
 			if (isPrimitiveType(objectType))
 			{
-				return String.valueOf(object);
+				return object;
 			}
 			if (objectType.isEnum())
 			{
@@ -108,17 +108,6 @@ public class ObjectConverter extends Converter
 			throws ObjectConversionException
 	{
 		return convertObject(object, null);
-	}
-
-	private String[] convertToStringArray(final Object object)
-	{
-		final int arrayLength = Array.getLength(object);
-		final String[] array = new String[arrayLength];
-		for (int i = 0; i < arrayLength; i++)
-		{
-			array[i] = String.valueOf(Array.get(object, i));
-		}
-		return array;
 	}
 
 	private Object convertArray(final Object[] object, final Optional<CustomConverter<?>> customConverter)
@@ -199,7 +188,7 @@ public class ObjectConverter extends Converter
 			final Collection<?> collection,
 			final Class<?> elementType,
 			final Optional<CustomConverter<?>> customConverter)
-					throws ObjectConversionException
+			throws ObjectConversionException
 	{
 		final Object[] array = collection.toArray(new Object[collection.size()]);
 		if (array.length == 0 && isPrimitiveType(elementType)

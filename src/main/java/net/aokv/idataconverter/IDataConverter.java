@@ -61,7 +61,7 @@ public class IDataConverter extends Converter
 
 	public <T> T convertToObject(
 			final IData iData, final String fieldName, final Class<T> fieldType, final Class<?> elementType)
-					throws IDataConversionException
+			throws IDataConversionException
 	{
 		if (iData == null)
 		{
@@ -118,47 +118,49 @@ public class IDataConverter extends Converter
 	private <T> T convertToPrimitiveType(final Object iData, final Class<T> objectType)
 			throws IDataConversionException
 	{
-		final String object = iData.toString();
-		switch (objectType.getName())
+		if (iData.getClass().equals(objectType))
 		{
-			case "java.lang.Byte":
-				return (T) convertToPrimitiveType(object, Byte::valueOf);
-			case "byte":
-				return (T) convertToPrimitiveType(object, Byte::parseByte);
-			case "java.lang.Short":
-				return (T) convertToPrimitiveType(object, Short::valueOf);
-			case "short":
-				return (T) convertToPrimitiveType(object, Short::parseShort);
-			case "java.lang.Integer":
-				return (T) convertToPrimitiveType(object, Integer::valueOf);
-			case "int":
-				return (T) convertToPrimitiveType(object, Integer::parseInt);
-			case "java.lang.Long":
-				return (T) convertToPrimitiveType(object, Long::valueOf);
-			case "long":
-				return (T) convertToPrimitiveType(object, Long::parseLong);
-			case "java.lang.Float":
-				return (T) convertToPrimitiveType(object, Float::valueOf);
-			case "float":
-				return (T) convertToPrimitiveType(object, Float::parseFloat);
-			case "java.lang.Double":
-				return (T) convertToPrimitiveType(object, Double::valueOf);
-			case "double":
-				return (T) convertToPrimitiveType(object, Double::parseDouble);
-			case "java.lang.Character":
-				return (T) convertToPrimitiveType(object, IDataConverter::stringToCharacter);
-			case "char":
-				return (T) convertToPrimitiveType(object, IDataConverter::stringToChar);
-			case "java.lang.Boolean":
-				return (T) convertToPrimitiveType(object, Boolean::valueOf);
-			case "boolean":
-				return (T) convertToPrimitiveType(object, Boolean::parseBoolean);
-			case "java.lang.Object":
-				return (T) iData;
-			default:
-				throw new IDataConversionException(
-						String.format("Could not convert <%s> to type <%s>.", iData, objectType));
+			return (T) iData;
 		}
+		final String object = iData.toString();
+		if (objectType.equals(byte.class) || objectType.equals(Byte.class))
+		{
+			return (T) convertToPrimitiveType(object, Byte::valueOf);
+		}
+		if (objectType.equals(short.class) || objectType.equals(Short.class))
+		{
+			return (T) convertToPrimitiveType(object, Short::valueOf);
+		}
+		if (objectType.equals(int.class) || objectType.equals(Integer.class))
+		{
+			return (T) convertToPrimitiveType(object, Integer::valueOf);
+		}
+		if (objectType.equals(long.class) || objectType.equals(Long.class))
+		{
+			return (T) convertToPrimitiveType(object, Long::valueOf);
+		}
+		if (objectType.equals(float.class) || objectType.equals(Float.class))
+		{
+			return (T) convertToPrimitiveType(object, Float::valueOf);
+		}
+		if (objectType.equals(double.class) || objectType.equals(Double.class))
+		{
+			return (T) convertToPrimitiveType(object, Double::valueOf);
+		}
+		if (objectType.equals(char.class) || objectType.equals(Character.class))
+		{
+			return (T) convertToPrimitiveType(object, IDataConverter::stringToCharacter);
+		}
+		if (objectType.equals(boolean.class) || objectType.equals(Boolean.class))
+		{
+			return (T) convertToPrimitiveType(object, Boolean::valueOf);
+		}
+		if (objectType.equals(Object.class))
+		{
+			return (T) iData;
+		}
+		throw new IDataConversionException(
+				String.format("Could not convert <%s> to type <%s>.", iData, objectType));
 	}
 
 	private <T> T convertToPrimitiveType(final String iData, final Function<String, T> converter)
@@ -167,11 +169,6 @@ public class IDataConverter extends Converter
 	}
 
 	private static Character stringToCharacter(final String string)
-	{
-		return string.charAt(0);
-	}
-
-	private static char stringToChar(final String string)
 	{
 		return string.charAt(0);
 	}
@@ -193,7 +190,7 @@ public class IDataConverter extends Converter
 	@SuppressWarnings("unchecked")
 	private <T> T convertField(final IData iData, final String fieldName, final Class<T> fieldType,
 			final Class<?> elementType, final Optional<CustomConverter<?>> customConverter)
-					throws IDataConversionException
+			throws IDataConversionException
 	{
 		final IDataCursor idc = iData.getCursor();
 		if (fieldType.isArray())
@@ -216,7 +213,7 @@ public class IDataConverter extends Converter
 
 	private <T> T convertFieldOrCollection(
 			final IData iData, final String fieldName, final Class<T> fieldType, final Class<?> elementType)
-					throws IDataConversionException
+			throws IDataConversionException
 	{
 		final IDataCursor idc = iData.getCursor();
 		if (elementType != null && Collection.class.isAssignableFrom(fieldType))
@@ -259,7 +256,7 @@ public class IDataConverter extends Converter
 	@SuppressWarnings("unchecked")
 	private <T> T convertArray(
 			final Object object, final Class<T> objectType, final Optional<CustomConverter<?>> customConverter)
-					throws IDataConversionException
+			throws IDataConversionException
 	{
 		if (object == null)
 		{

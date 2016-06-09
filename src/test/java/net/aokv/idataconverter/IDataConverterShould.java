@@ -206,24 +206,12 @@ public class IDataConverterShould
 		final IData dIData = createIData("array", dArray);
 		final Double[] dActual = sut.convertToObject(dIData, "array", Double[].class);
 		assertThat(dActual, is(dArray));
-	}
 
-	@Test
-	public void convertSimpleArraysFromStrings() throws IDataConversionException
-	{
-		String[] array = new String[]
-		{ "1", "2" };
-		final IData iData = createIData("array", array);
-		final int[] actual = sut.convertToObject(iData, "array", int[].class);
-		assertThat(actual, is(new int[]
-		{ 1, 2 }));
-
-		array = new String[]
-		{ "1.1", "2.2" };
-		final IData dIData = createIData("array", array);
-		final Double[] dActual = sut.convertToObject(dIData, "array", Double[].class);
-		assertThat(dActual, is(new Double[]
-		{ 1.1, 2.2 }));
+		final byte[] bArray = new byte[]
+		{ 1, 2 };
+		final IData bIData = createIData("array", bArray);
+		final byte[] bActual = sut.convertToObject(bIData, "array", byte[].class);
+		assertThat(bActual, is(bArray));
 	}
 
 	@Test

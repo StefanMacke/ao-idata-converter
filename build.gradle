@@ -28,7 +28,8 @@ logger.debug('buildscript configuration activated')
 	"checkstyle",
 	"findbugs",
 	"pmd",
-	"jacoco"
+	"jacoco",
+	"sonarqube"
 ].each {
 	apply from: "${project.gradleApplyFromPath}/net-aokv-${it}.gradle"
 }

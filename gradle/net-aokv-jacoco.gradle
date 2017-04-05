@@ -1,8 +1,9 @@
 apply plugin: 'jacoco'
 
-logger.info('JaCoCo 1.+ plugin activated')
+logger.info('JaCoCo-Plugin aktiviert')
 
 jacoco {
+    toolVersion = project.jacocoVersion
     reportsDir = file("${project.reporting.baseDir.absolutePath}/jacoco")
 }
 

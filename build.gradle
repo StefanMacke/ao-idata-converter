@@ -40,12 +40,18 @@ jar {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.11'
+    gradleVersion = '3.4'
 }
 
 dependencies {
-	compile "com.google.guava:guava:19.0",
-		"com.wm:is-client:9.5", // must be added to local repository
-		"com.wm:is-server:9.5", // must be added to local repository
-		"com.entrust.toolkit:enttoolkit:8.0.23" // must be added to local repository
+	compile "com.google.guava:guava:21.0",
+		"com.wm:is-client:9.12", // must be added to local repository
+		"com.wm:is-server:9.12", // must be added to local repository
+		"com.entrust.toolkit:enttoolkit:8.0.33" // must be added to local repository
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'xml-apis:xml-apis:1.4.01'
+    }
 }
